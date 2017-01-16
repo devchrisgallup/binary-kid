@@ -1,5 +1,3 @@
-var IDE_HOOK = false;
-var VERSION = "2.6.2";
 var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, "", { preload: preload, create: create, update: update });
 
 function preload() {
@@ -40,10 +38,6 @@ function create() {
     // Create a delayed event 3 seconds from now
     timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 3, this.endTimer, this);
 
-    // set collision
-    map.setCollisionBetween(0,0); 
-    map.setCollisionBetween(3,4);
-
     // player settings
     player = this.add.sprite(100, 1150, "player"); 
     player.anchor.setTo(0.5, 0.5);  
@@ -69,6 +63,9 @@ function create() {
     this.particlesBurst.maxParticleSpeed.setTo(100, -100); 
     this.particlesBurst.makeParticles("particles");
 
+    // set collision
+    map.setCollisionBetween(0,0); 
+    map.setCollisionBetween(3,4);
     map.setTileIndexCallback(1, resetPlayer, this); 
     map.setTileIndexCallback(2, getParticles, this); 
     map.setTileIndexCallback(7, speedBoost, this);
@@ -82,23 +79,14 @@ function create() {
 }
 
 function update() {
+    // set to true when player 
+    // collects coins  or dies
     burstFlag = false; 
     particlesFlag = false;
+
+
     this.physics.arcade.collide(player, layer);
-
     player.body.velocity.x = 0; 
-
-    if (controls.right.isDown) {
-        player.animations.play("run");
-        player.scale.setTo(1, 1); 
-        player.body.velocity.x += playerSpeed;  
-    }
-
-    if (controls.left.isDown) {
-        player.animations.play("run");
-        player.scale.setTo(-1, 1); 
-        player.body.velocity.x -= playerSpeed;  
-    }
 
     if (controls.up.isDown && (player.body.onFloor() || player.body.touching.down && this.now > jumpTimer)) {
         player.body.velocity.y = -600; 
@@ -167,7 +155,7 @@ function touchStart(evt) {
             jumpTimer +=  750; 
             player.animations.play("jump");            
         } 
-        // reset playerJumpCount to 0 after a 1.5/10 of a second
+        // reset playerJumpCount to 0 after a 150 milliseconds of a second
         if(playerJumpCount > 2) {
         setTimeout(function() {
                     playerJumpCount = 0; 
