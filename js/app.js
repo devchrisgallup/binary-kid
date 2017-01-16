@@ -9,6 +9,10 @@ function preload() {
     // particle effects
     game.load.image("explosion", "assets/explosion.png");
     game.load.image("particles", "assets/particles.png");
+    // sound effects
+    game.load.audio("jump", "assets/jump.wav"); 
+    game.load.audio("playerDiedSound", "assets/playerdiedsound.wav"); 
+    game.load.audio("splash", "assets/splash.wav"); 
 }
 
 // variables
@@ -24,6 +28,9 @@ var burstFlag = false;
 var particlesFlag = false; 
 var burst;
 var particlesBurst;
+var jump;
+var splashSound;
+var playerDiedSound; 
 
 function create() {
     this.stage.backgroundColor = "#000"; 
@@ -37,6 +44,13 @@ function create() {
     timer = game.time.create();
     // Create a delayed event 3 seconds from now
     timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 3, this.endTimer, this);
+
+    // sound effect settings
+    jump = this.game.add.audio("jump"); 
+    jump.volume = 0.2; 
+    playerDiedSound = this.game.add.audio("playerDiedSound"); 
+    playerDiedSound.volume = 0.5; 
+    splashSound = this.game.add.audio("splash");
 
     // player settings
     player = this.add.sprite(100, 1150, "player"); 
@@ -89,6 +103,7 @@ function update() {
     player.body.velocity.x = 0; 
 
     if (controls.up.isDown && (player.body.onFloor() || player.body.touching.down && this.now > jumpTimer)) {
+        jump.play();
         player.body.velocity.y = -600; 
         jumpTimer = this.time.now + 750; 
         player.animations.play("jump"); 
@@ -115,6 +130,7 @@ function update() {
 
 function resetPlayer() {
     timer.start();
+    playerDiedSound.play();
     burstFlag = true;
     player.kill();
     setTimeout(function() {
@@ -124,6 +140,7 @@ function resetPlayer() {
 }
 
 function getParticles() {
+    splashSound.play();
     map.putTile(-1, layer.getTileX(player.x), layer.getTileY(player.y));
     particlesFlag = true; 
     playerSpeed += 21;
@@ -133,6 +150,7 @@ function getParticles() {
 }
 
 function speedBoost() {
+    splashSound.play();
     particlesFlag = true; 
     map.putTile(-1, layer.getTileX(player.x), layer.getTileY(player.y));
     playerSpeed += 50;
@@ -145,11 +163,13 @@ function speedBoost() {
 function touchStart(evt) {
     evt.preventDefault(); 
         if(player.body.onFloor() || player.body.touching.down && this.now > jumpTimer) {
+            jump.play();
             playerJumpCount++;
             player.body.velocity.y = -600; 
             jumpTimer +=  750; 
             player.animations.play("jump"); 
         } else if(playerJumpCount < 2) {
+            jump.play();
             playerJumpCount++;
             player.body.velocity.y = -400; 
             jumpTimer +=  750; 
