@@ -21,7 +21,7 @@ var map;
 var layers; 
 var player;
 var controls = {}; 
-var playerSpeed = 115;
+var playerSpeed = 105;
 var playerJumpCount = 0;
 var jumpTimer = 0; 
 var running = true;
