@@ -13,6 +13,7 @@ function preload() {
     game.load.audio("jump", "assets/jump.wav"); 
     game.load.audio("playerDiedSound", "assets/playerdiedsound.wav"); 
     game.load.audio("splash", "assets/splash.wav"); 
+    game.load.audio("youwin", "assets/winsound.wav"); 
 }
 
 // variables
@@ -20,7 +21,7 @@ var map;
 var layers; 
 var player;
 var controls = {}; 
-var playerSpeed = 88;
+var playerSpeed = 115;
 var playerJumpCount = 0;
 var jumpTimer = 0; 
 var running = true;
@@ -31,6 +32,11 @@ var particlesBurst;
 var jump;
 var splashSound;
 var playerDiedSound; 
+var score = 0; 
+var scoreText; 
+var winText;
+var refreshIntervalId;
+var winSound; 
 
 function create() {
     this.stage.backgroundColor = "#000"; 
@@ -44,6 +50,9 @@ function create() {
     timer = game.time.create();
     // Create a delayed event 3 seconds from now
     timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 3, this.endTimer, this);
+    // Create score text
+    scoreText = game.add.text(this.game.width / 2,this.game.height - 35,"Score: ", {font: '32px Arial', fill:  '#fff'});
+    scoreText.fixedToCamera = true; 
 
     // sound effect settings
     jump = this.game.add.audio("jump"); 
@@ -51,6 +60,7 @@ function create() {
     playerDiedSound = this.game.add.audio("playerDiedSound"); 
     playerDiedSound.volume = 0.5; 
     splashSound = this.game.add.audio("splash");
+    winSound = this.game.add.audio("youwin");
 
     // player settings
     player = this.add.sprite(100, 1150, "player"); 
@@ -98,6 +108,7 @@ function update() {
     burstFlag = false; 
     particlesFlag = false;
 
+    scoreText.text = "Score: " + score;
 
     this.physics.arcade.collide(player, layer);
     player.body.velocity.x = 0; 
@@ -126,9 +137,17 @@ function update() {
         this.particlesBurst.y = player.y; 
         this.particlesBurst.start(true, 1000, null, 10);
     }
+
+    // Did you win?
+    if (player.x > 6384) {
+        clearInterval(refreshIntervalId);
+        winText = this.game.add.text(this.game.width / 2, this.game.height / 2, "You Win!", {font: '32px Arial', fill:  '#fff'});
+        winText.fixedToCamera = true;
+    }
 }
 
 function resetPlayer() {
+    score = 0; 
     timer.start();
     playerDiedSound.play();
     burstFlag = true;
@@ -182,3 +201,9 @@ function touchStart(evt) {
                 }, 150);
         } 
 }
+
+function timerStart() {
+    refreshIntervalId = setInterval(function() { score++; }, 1000);   
+}
+
+window.addEventListener('load', timerStart, false); 
