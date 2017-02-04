@@ -6,6 +6,7 @@ function preload() {
     game.load.tilemap("map", "assets/level1.csv"); 
     game.load.image("tileset", "assets/tileset.png");
     game.load.spritesheet("player", "assets/player.png", 23.3, 26);
+    game.load.spritesheet("enemy", "assets/binarybug.png", 23.3, 26);
     // particle effects
     game.load.image("explosion", "assets/explosion.png");
     game.load.image("particles", "assets/particles.png");
@@ -24,6 +25,10 @@ var controls = {};
 var playerSpeed = 105;
 var playerJumpCount = 0;
 var jumpTimer = 0; 
+var enemy;
+var endEnemy; 
+var endFlip = true; 
+var flip = true; 
 var running = true;
 var burstFlag = false; 
 var particlesFlag = false; 
@@ -71,6 +76,18 @@ function create() {
     this.camera.follow(player); 
     player.body.collideWorldBounds = true;
 
+    enemy = this.add.sprite(1670, 1150, "enemy"); 
+    enemy.anchor.setTo(0.5,0.5); 
+    enemy.animations.add("run",[3,4,5,6,7,8], 7, true); 
+    this.physics.arcade.enable(enemy); 
+    enemy.body.collideWorldBounds = true;
+     
+    endEnemy = this.add.sprite(6000, 200, "enemy"); 
+    endEnemy.anchor.setTo(0.5,0.5); 
+    endEnemy.animations.add("run",[3,4,5,6,7,8], 7, true); 
+    this.physics.arcade.enable(endEnemy); 
+    endEnemy.body.collideWorldBounds = true; 
+
     // particle effect settings
     this.burst = this.add.emitter(0, 0, 60); 
     this.burst.minParticleScale = 0.4; 
@@ -103,6 +120,7 @@ function create() {
 }
 
 function update() {
+    console.log(endEnemy.x + ' ' + endEnemy.y); 
     // set to true when player 
     // collects coins  or dies
     burstFlag = false; 
@@ -111,7 +129,12 @@ function update() {
     scoreText.text = "Score: " + score;
 
     this.physics.arcade.collide(player, layer);
+    this.physics.arcade.collide(enemy, layer);
+    this.physics.arcade.collide(endEnemy, layer);
+
     player.body.velocity.x = 0; 
+    enemy.body.velocity.x = 0;
+    endEnemy.body.velocity.x = 0;
 
     if (controls.up.isDown && (player.body.onFloor() || player.body.touching.down && this.now > jumpTimer)) {
         jump.play();
@@ -136,6 +159,42 @@ function update() {
         this.particlesBurst.x = player.x; 
         this.particlesBurst.y = player.y; 
         this.particlesBurst.start(true, 1000, null, 10);
+    }
+
+    // binarybug logic
+    if (enemy.x < 1710 && flip) {
+        flip = true; 
+        enemy.animations.play("run");
+        enemy.scale.setTo(1, 1); 
+        enemy.body.velocity.x += playerSpeed; 
+    } else {
+        flip = false;
+    }
+    if (enemy.x > 1612 && !flip) {
+        flip = false; 
+        enemy.animations.play("run");
+        enemy.scale.setTo(1, 1); 
+        enemy.body.velocity.x -= playerSpeed; 
+    } else {
+        flip = true; 
+    }
+
+    // binarybug end bug logic
+    if (endEnemy.x < 6131 && endFlip) {
+        endFlip = true; 
+        endEnemy.animations.play("run");
+        endEnemy.scale.setTo(1, 1); 
+        endEnemy.body.velocity.x += playerSpeed; 
+    } else {
+        endFlip = false;
+    }
+    if (endEnemy.x > 5985 && !endFlip) {
+        endFlip = false; 
+        endEnemy.animations.play("run");
+        endEnemy.scale.setTo(1, 1); 
+        endEnemy.body.velocity.x -= playerSpeed; 
+    } else {
+        endFlip = true; 
     }
 
     // Did you win?
