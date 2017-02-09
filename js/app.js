@@ -121,7 +121,6 @@ function create() {
 }
 
 function update() {
-    console.log(endEnemy.x + ' ' + endEnemy.y); 
     // set to true when player 
     // collects coins  or dies
     burstFlag = false; 
@@ -132,6 +131,9 @@ function update() {
     this.physics.arcade.collide(player, layer);
     this.physics.arcade.collide(enemy, layer);
     this.physics.arcade.collide(endEnemy, layer);
+
+    // collision Detection
+    this.physics.arcade.overlap(player, enemy, colEmyOne, null, this); 
 
     player.body.velocity.x = 0; 
     enemy.body.velocity.x = 0;
@@ -260,6 +262,11 @@ function touchStart(evt) {
                     playerJumpCount = 0; 
                 }, 150);
         } 
+}
+
+function colEmyOne() {
+    playerDiedSound.play();
+    score = 0; 
 }
 
 function timerStart() {
