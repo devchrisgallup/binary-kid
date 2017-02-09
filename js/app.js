@@ -23,6 +23,7 @@ var layers;
 var player;
 var controls = {}; 
 var playerSpeed = 105;
+var enemySpeed = 88; 
 var playerJumpCount = 0;
 var jumpTimer = 0; 
 var enemy;
@@ -166,7 +167,7 @@ function update() {
         flip = true; 
         enemy.animations.play("run");
         enemy.scale.setTo(1, 1); 
-        enemy.body.velocity.x += playerSpeed; 
+        enemy.body.velocity.x += enemySpeed; 
     } else {
         flip = false;
     }
@@ -174,7 +175,7 @@ function update() {
         flip = false; 
         enemy.animations.play("run");
         enemy.scale.setTo(1, 1); 
-        enemy.body.velocity.x -= playerSpeed; 
+        enemy.body.velocity.x -= enemySpeed; 
     } else {
         flip = true; 
     }
@@ -184,7 +185,7 @@ function update() {
         endFlip = true; 
         endEnemy.animations.play("run");
         endEnemy.scale.setTo(1, 1); 
-        endEnemy.body.velocity.x += playerSpeed; 
+        endEnemy.body.velocity.x += enemySpeed; 
     } else {
         endFlip = false;
     }
@@ -192,7 +193,7 @@ function update() {
         endFlip = false; 
         endEnemy.animations.play("run");
         endEnemy.scale.setTo(1, 1); 
-        endEnemy.body.velocity.x -= playerSpeed; 
+        endEnemy.body.velocity.x -= enemySpeed; 
     } else {
         endFlip = true; 
     }
