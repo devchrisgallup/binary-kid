@@ -266,7 +266,14 @@ function touchStart(evt) {
 
 function colEmyOne() {
     playerDiedSound.play();
-    score = 0; 
+    burstFlag = true;
+    player.kill(); 
+    setTimeout(function() {
+        score = 0; 
+        player.revive(); 
+        player.x = 100; 
+        player.y = 1150; 
+    }, 2000);
 }
 
 function timerStart() {
